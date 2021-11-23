@@ -60,6 +60,7 @@ ARDOR_TESTNET_SERVICE="ardor-testnet"
 
 
 LOCAL_USER=$(whoami)
+HOME_DIR="${HOME}"
 
 
 PROFILE_LANGUAGE_VARIABLE="
@@ -137,8 +138,8 @@ After=network.target
 [Service]
 RestartSec=2s
 Type=simple
-WorkingDirectory=/home/${LOCAL_USER}/${ARDOR_MAINNET_FOLDER}/
-ExecStart=/bin/bash /home/${LOCAL_USER}/${ARDOR_MAINNET_FOLDER}/run.sh
+WorkingDirectory=${HOME_DIR}/${ARDOR_MAINNET_FOLDER}/
+ExecStart=/bin/bash ${HOME_DIR}/${ARDOR_MAINNET_FOLDER}/run.sh
 Restart=always
 
 [Install]
@@ -155,8 +156,8 @@ After=network.target
 [Service]
 RestartSec=2s
 Type=simple
-WorkingDirectory=/home/${LOCAL_USER}/${ARDOR_TESTNET_FOLDER}/
-ExecStart=/bin/bash /home/${LOCAL_USER}/${ARDOR_TESTNET_FOLDER}/run.sh
+WorkingDirectory=${HOME_DIR}/${ARDOR_TESTNET_FOLDER}/
+ExecStart=/bin/bash ${HOME_DIR}/${ARDOR_TESTNET_FOLDER}/run.sh
 Restart=always
 
 [Install]
@@ -387,7 +388,7 @@ if [ -z \${REMOTE_VERSION} ] || [ -z \${LOCAL_VERSION} ]; then
 fi
 
 if [ \${REMOTE_VERSION} != \${LOCAL_VERSION} ]; then
-  cd /home/${LOCAL_USER}
+  cd ${HOME_DIR}
   
   echo \"[INFO] downloading new ardor release ...\"
   wget https://www.jelurida.com/ardor-client.zip -q --show-progress
@@ -481,7 +482,7 @@ date +\"%Y-%m-%d %H:%M:%S || [INFO] Starting Ardor Optimization\"
 
 
       echo \"\" && echo \"[INFO] Optimizing mainnet node ...\"
-      cd /home/${LOCAL_USER}/${ARDOR_MAINNET_FOLDER}
+      cd ${HOME_DIR}/${ARDOR_MAINNET_FOLDER}
       /bin/bash compact.sh
 
 
@@ -497,7 +498,7 @@ date +\"%Y-%m-%d %H:%M:%S || [INFO] Starting Ardor Optimization\"
 
 
       echo \"\" && echo \"[INFO] Optimizing testnet node ...\"
-      cd /home/${LOCAL_USER}/${ARDOR_TESTNET_FOLDER}
+      cd ${HOME_DIR}/${ARDOR_TESTNET_FOLDER}
       /bin/bash compact.sh
 
 
@@ -671,9 +672,9 @@ if [ ${ENABLE_LETSENCRYPT} == true ]; then
     sudo certbot --nginx  --agree-tos --register-unsafely-without-email --rsa-key-size 4096 --redirect ${MAINNET_DOMAIN_CMD} ${TESTNET_DOMAIN_CMD}
 
     echo "" && echo "[INFO] creating renew certificate job ..."
-    echo "${RENEW_CERTIFICATE_SCRIPT_CONTENT}" > /home/${LOCAL_USER}/renew-certificate.sh
-    sudo chmod 700 /home/${LOCAL_USER}/renew-certificate.sh
-    (sudo crontab -l 2>> /dev/null; echo "${LETSENCRYPT_RENEW_EVENT}	/bin/bash /home/${LOCAL_USER}/renew-certificate.sh") | sudo crontab -
+    echo "${RENEW_CERTIFICATE_SCRIPT_CONTENT}" > ${HOME_DIR}/renew-certificate.sh
+    sudo chmod 700 ${HOME_DIR}/renew-certificate.sh
+    (sudo crontab -l 2>> /dev/null; echo "${LETSENCRYPT_RENEW_EVENT}	/bin/bash ${HOME_DIR}/renew-certificate.sh") | sudo crontab -
 
 
 elif [ ${ENABLE_SELF_SIGNED_CERTIFICATE} == true ]; then
@@ -709,25 +710,25 @@ fi
 
 
 echo "" && echo "[INFO] creating update script ..."
-echo "${UPDATE_ARDOR_NODES_SCRIPT_CONTENT}" > /home/${LOCAL_USER}/update-nodes.sh
-sudo chmod 700 /home/${LOCAL_USER}/update-nodes.sh
+echo "${UPDATE_ARDOR_NODES_SCRIPT_CONTENT}" > ${HOME_DIR}/update-nodes.sh
+sudo chmod 700 ${HOME_DIR}/update-nodes.sh
 
 [ "${AUTO_UPDATES:-}" ] || read -r -p "Would you like to enable automatic updates? (Default yes): " AUTO_UPDATES
 AUTO_UPDATES=${AUTO_UPDATES:-yes}
 if [ "$AUTO_UPDATES" == "yes" ]; then
   RANDOM_HOUR=$((1 + RANDOM % 3))
-  (sudo crontab -l 2>> /dev/null; echo "0 $RANDOM_HOUR * * *  /bin/bash /home/${LOCAL_USER}/update-nodes.sh >/dev/null 2>&1") | sudo crontab -
+  (sudo crontab -l 2>> /dev/null; echo "0 $RANDOM_HOUR * * *  /bin/bash ${HOME_DIR}/update-nodes.sh >/dev/null 2>&1") | sudo crontab -
 fi
 
 echo "" && echo "[INFO] creating optimize script ..."
-echo "${OPTIMIZE_ARDOR_NODES_SCRIPT_CONTENT}" > /home/${LOCAL_USER}/optimize-nodes.sh
-sudo chmod 700 /home/${LOCAL_USER}/optimize-nodes.sh
+echo "${OPTIMIZE_ARDOR_NODES_SCRIPT_CONTENT}" > ${HOME_DIR}/optimize-nodes.sh
+sudo chmod 700 ${HOME_DIR}/optimize-nodes.sh
 
 [ "${OPTIMIZE_NODES:-}" ] || read -r -p "Would you like to enable monthly optimization of node(s)? (Default yes): " OPTIMIZE_NODES
 OPTIMIZE_NODES=${OPTIMIZE_NODES:-yes}
 if [ "$OPTIMIZE_NODES" == "yes" ]; then
   RANDOM_DAY=$((1 + RANDOM % 27))
-  (sudo crontab -l 2>> /dev/null; echo "0 0 $RANDOM_DAY * *  /bin/bash /home/${LOCAL_USER}/optimize-nodes.sh >/dev/null 2>&1") | sudo crontab -
+  (sudo crontab -l 2>> /dev/null; echo "0 0 $RANDOM_DAY * *  /bin/bash ${HOME_DIR}/optimize-nodes.sh >/dev/null 2>&1") | sudo crontab -
 fi
 
 echo "" && echo "[INFO] cleaning up ..."
