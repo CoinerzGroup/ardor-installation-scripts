@@ -49,6 +49,7 @@ ARDOR_TESTNET_SERVICE="ardor-testnet"
 
 
 LOCAL_USER=$(whoami)
+HOME_DIR="${HOME}"
 
 
 PROFILE_LANGUAGE_VARIABLE="
@@ -197,8 +198,8 @@ After=network.target
 [Service]
 RestartSec=2s
 Type=simple
-WorkingDirectory=/home/${LOCAL_USER}/${ARDOR_MAINNET_FOLDER}/
-ExecStart=/bin/bash /home/${LOCAL_USER}/${ARDOR_MAINNET_FOLDER}/run.sh
+WorkingDirectory=${HOME_DIR}/${ARDOR_MAINNET_FOLDER}/
+ExecStart=/bin/bash ${HOME_DIR}/${ARDOR_MAINNET_FOLDER}/run.sh
 Restart=always
 
 [Install]
@@ -215,8 +216,8 @@ After=network.target
 [Service]
 RestartSec=2s
 Type=simple
-WorkingDirectory=/home/${LOCAL_USER}/${ARDOR_TESTNET_FOLDER}/
-ExecStart=/bin/bash /home/${LOCAL_USER}/${ARDOR_TESTNET_FOLDER}/run.sh
+WorkingDirectory=${HOME_DIR}/${ARDOR_TESTNET_FOLDER}/
+ExecStart=/bin/bash ${HOME_DIR}/${ARDOR_TESTNET_FOLDER}/run.sh
 Restart=always
 
 [Install]
@@ -513,9 +514,9 @@ if [ ${ENABLE_LETSENCRYPT} == true ]; then
     sudo certbot --nginx  --agree-tos --register-unsafely-without-email --rsa-key-size 4096 --redirect ${MAINNET_DOMAIN_CMD} ${TESTNET_DOMAIN_CMD}
 
     echo "" && echo "[INFO] creating renew certificate job ..."
-    echo "${RENEW_CERTIFICATE_SCRIPT_CONTENT}" > /home/${LOCAL_USER}/renew-certificate.sh
-    sudo chmod 700 /home/${LOCAL_USER}/renew-certificate.sh
-    (sudo crontab -l 2>> /dev/null; echo "${LETSENCRYPT_RENEW_EVENT}	/bin/bash /home/${LOCAL_USER}/renew-certificate.sh") | sudo crontab -
+    echo "${RENEW_CERTIFICATE_SCRIPT_CONTENT}" > ${HOME_DIR}/renew-certificate.sh
+    sudo chmod 700 ${HOME_DIR}/renew-certificate.sh
+    (sudo crontab -l 2>> /dev/null; echo "${LETSENCRYPT_RENEW_EVENT}	/bin/bash ${HOME_DIR}/renew-certificate.sh") | sudo crontab -
 
 
 elif [ ${ENABLE_SELF_SIGNED_CERTIFICATE} == true ]; then
@@ -551,8 +552,8 @@ fi
 
 
 echo "" && echo "[INFO] creating update script ..."
-echo "${UPDATE_ARDOR_NODES_SCRIPT_CONTENT}" > /home/${LOCAL_USER}/update-nodes.sh
-sudo chmod 700 /home/${LOCAL_USER}/update-nodes.sh
+echo "${UPDATE_ARDOR_NODES_SCRIPT_CONTENT}" > ${HOME_DIR}/update-nodes.sh
+sudo chmod 700 ${HOME_DIR}/update-nodes.sh
 
 
 echo "" && echo "[INFO] cleaning up ..."
